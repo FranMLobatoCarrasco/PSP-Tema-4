@@ -2,24 +2,23 @@ package main;
 
 import java.util.Scanner;
 
+import static main.Utilidad.pedirContrasena;
+
 public class Descifrado {
     public static void main(String[] args) {
-        // Una clase que contenga un método main que genera la clave, lee el contenido de un fichero y lo descifra.
-        // El texto descifrado debe mostrarse por consola.
-
         Scanner sc = new Scanner(System.in);
         String constrasena;
+        int longitudBloque;
 
         System.out.println("=========================================================");
-        System.out.print("Introduzca la contraseña que va a usar ➜ ");
-        constrasena = sc.nextLine();
+        constrasena = pedirContrasena();
+        System.out.println("Introduzca la longitud de bloque. ");
+        System.out.print("Debe ser 16, 24 o 32 ➜ ");
+        longitudBloque = sc.nextInt();
         System.out.println("=========================================================");
 
+        UtilidadCifrado utilidadCifrado = new UtilidadCifrado(constrasena, longitudBloque);
 
-        Utilidades utilidades = new Utilidades(constrasena);
-
-        utilidades.desencriptar();
+        utilidadCifrado.desencriptar();
     }
-
-    //TODO: crear metodo que compruebe la contraseña si es de 16 caracteres
 }
