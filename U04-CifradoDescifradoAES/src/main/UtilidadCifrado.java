@@ -40,7 +40,6 @@ public class UtilidadCifrado {
             byte[] cipherText = cipher.doFinal(textoAEncriptar.getBytes());
 
             escribirFichero(Base64.getEncoder().encodeToString(cipherText));
-
         } catch (NoSuchAlgorithmException e) {
             System.err.println("No existe el algoritmo especificado");
             System.err.println("Mensaje de error: " + e.getMessage());

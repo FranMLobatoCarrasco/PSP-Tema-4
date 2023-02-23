@@ -14,10 +14,10 @@ public class Utilidad {
         do {
             System.out.print("Introduzca la contraseña que va a usar ➜ ");
             contrasena = sc.next();
-            if (contrasena.length() != 16) {
-                System.out.println("⚠️ La contraseña debe tener 16 caracteres. ⚠️");
+            if (!(contrasena.length() == 16) && !(contrasena.length() == 24) && !(contrasena.length() == 32)) {
+                System.out.println("⚠️ La contraseña debe tener 16, 24 o 32 caracteres. ⚠️");
             }
-        } while (contrasena.length() != 16);
+        } while (!(contrasena.length() == 16) && !(contrasena.length() == 24) && !(contrasena.length() == 32));
         return contrasena;
     }
 }
