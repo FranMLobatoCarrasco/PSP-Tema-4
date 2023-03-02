@@ -29,7 +29,7 @@ public class EncriptacionRSA {
             PrivateKey clavePrivada = GestorLlaves.obtenerClavePrivadaER("emisor");
 
             System.out.println("Cifrando mensaje...");
-            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.ENCRYPT_MODE, clavePrivada);
             byte[] mensajeBytes = mensaje.getBytes(StandardCharsets.UTF_8);
             byte[] mensajeCifrado = cipher.doFinal(mensajeBytes);
@@ -80,7 +80,7 @@ public class EncriptacionRSA {
 
     public static byte[] cifrarContenido(byte[] contenido, Key clave) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
         // Crear objeto Cipher
-        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        Cipher cipher = Cipher.getInstance("RSA");
 
         // Inicializar cifrador en modo cifrado con la clave proporcionada
         cipher.init(Cipher.ENCRYPT_MODE, clave);

@@ -9,6 +9,7 @@ import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
+import java.util.Scanner;
 
 public class DesencriptadoRSA {
 
@@ -18,7 +19,7 @@ public class DesencriptadoRSA {
             PrivateKey clavePrivada = GestorLlaves.obtenerClavePrivadaER("receptor");
 
             System.out.println("Descifrando mensaje...");
-            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            Cipher cipher = Cipher.getInstance("RSA");
 
             byte[] mensajeCifrado = Base64.getDecoder().decode(leerYDevolverMensaje());
 
@@ -66,10 +67,9 @@ public class DesencriptadoRSA {
         }
         return linea;
     }
-
     public static byte[] cifrarContenido(byte[] contenido, Key clave) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
         // Crear objeto Cipher
-        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        Cipher cipher = Cipher.getInstance("RSA");
 
         // Inicializar cifrador en modo cifrado con la clave proporcionada
         cipher.init(Cipher.DECRYPT_MODE, clave);
