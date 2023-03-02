@@ -13,8 +13,11 @@ import java.security.spec.X509EncodedKeySpec;
 
 public class GestorLlaves {
 
-    private static final String CLAVE_PUBLICA = "src/keys/clavePublica.key";
-    private static final String CLAVE_PRIVADA = "src/keys/clavePrivada.key";
+    private static final String CLAVE_PUBLICA_EMISOR = "src/keys/emisor/clavePublica.key";
+    private static final String CLAVE_PRIVADA_EMISOR = "src/keys/emisor/clavePrivada.key";
+    private static final String CLAVE_PUBLICA_RECEPTOR = "src/keys/receptor/clavePublica.key";
+    private static final String CLAVE_PRIVADA_RECEPTOR = "src/keys/receptor/clavePrivada.key";
+
 
     public static void main(String[] args) {
         KeyPair claves = generarClaves();
@@ -47,10 +50,16 @@ public class GestorLlaves {
     public static void guardarClaves(KeyPair claves) {
         FileOutputStream fileOutputStream;
         try {
-            fileOutputStream = new FileOutputStream(CLAVE_PUBLICA);
+            fileOutputStream = new FileOutputStream(CLAVE_PUBLICA_EMISOR);
             fileOutputStream.write(claves.getPublic().getEncoded());
             fileOutputStream.close();
-            fileOutputStream = new FileOutputStream(CLAVE_PRIVADA);
+            fileOutputStream = new FileOutputStream(CLAVE_PRIVADA_EMISOR);
+            fileOutputStream.write(claves.getPrivate().getEncoded());
+            fileOutputStream.close();
+            fileOutputStream = new FileOutputStream(CLAVE_PUBLICA_RECEPTOR);
+            fileOutputStream.write(claves.getPublic().getEncoded());
+            fileOutputStream.close();
+            fileOutputStream = new FileOutputStream(CLAVE_PRIVADA_RECEPTOR);
             fileOutputStream.write(claves.getPrivate().getEncoded());
             fileOutputStream.close();
         } catch (FileNotFoundException e) {
@@ -65,11 +74,10 @@ public class GestorLlaves {
      *
      * @return La clave pública.
      */
-    public static PublicKey obtenerClavePublica() {
-        File ficheroClavePublica = new File(CLAVE_PUBLICA);
+    private static PublicKey obtenerClavePublica(File fichero) {
         PublicKey clavePublica = null;
         try {
-            byte[] bytesClavePublica = Files.readAllBytes(ficheroClavePublica.toPath());
+            byte[] bytesClavePublica = Files.readAllBytes(fichero.toPath());
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(bytesClavePublica);
             clavePublica = keyFactory.generatePublic(publicKeySpec);
@@ -83,16 +91,23 @@ public class GestorLlaves {
         return clavePublica;
     }
 
+    public static PublicKey obtenerClavePublicaER(String emisorReceptor) {
+        return switch (emisorReceptor) {
+            case "emisor" -> obtenerClavePublica(new File(CLAVE_PUBLICA_EMISOR));
+            case "receptor" -> obtenerClavePublica(new File(CLAVE_PUBLICA_RECEPTOR));
+            default -> null;
+        };
+    }
+
     /**
      * Obtiene la clave privada del fichero.
      *
      * @return La clave privada.
      */
-    public static PrivateKey obtenerClavePrivada() {
-        File ficheroClavePrivada = new File(CLAVE_PRIVADA);
+    private static PrivateKey obtenerClavePrivada(File fichero) {
         PrivateKey clavePrivada = null;
         try {
-            byte[] bytesClavePrivada = Files.readAllBytes(ficheroClavePrivada.toPath());
+            byte[] bytesClavePrivada = Files.readAllBytes(fichero.toPath());
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(bytesClavePrivada);
             clavePrivada = keyFactory.generatePrivate(privateKeySpec);
@@ -104,5 +119,13 @@ public class GestorLlaves {
             System.err.println("ERROR. La clave indicada no es válida. " + e.getMessage());
         }
         return clavePrivada;
+    }
+
+    public static PrivateKey obtenerClavePrivadaER(String emisorReceptor) {
+        return switch (emisorReceptor) {
+            case "emisor" -> obtenerClavePrivada(new File(CLAVE_PRIVADA_EMISOR));
+            case "receptor" -> obtenerClavePrivada(new File(CLAVE_PRIVADA_RECEPTOR));
+            default -> null;
+        };
     }
 }
