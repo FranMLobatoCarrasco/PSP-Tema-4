@@ -13,12 +13,71 @@ import java.security.spec.X509EncodedKeySpec;
 
 public class GestorLlaves {
 
-    private static final String CLAVE_PUBLICA = "src/keys/clavePublica.key";
-    private static final String CLAVE_PRIVADA = "src/keys/clavePrivada.key";
+    private static final String CLAVE_PUBLICA_EMISOR = "src/keys/emisor/clavePublica.key";
+    private static final String CLAVE_PRIVADA_EMISOR = "src/keys/emisor/clavePrivada.key";
+    private static final String CLAVE_PUBLICA_RECEPTOR = "src/keys/receptor/clavePublica.key";
+    private static final String CLAVE_PRIVADA_RECEPTOR = "src/keys/receptor/clavePrivada.key";
 
-    public static void main(String[] args) {
-        KeyPair claves = generarClaves();
-        guardarClaves(claves);
+    /**
+     * Constructor de la clase.
+     */
+    public GestorLlaves() {
+        comprobarYborrarFicheros();
+        KeyPair clavesEmisor = generadorClaves();
+        KeyPair clavesReceptor = generadorClaves();
+        guardarClaves(clavesEmisor, clavesReceptor);
+    }
+
+    /**
+     * Obtiene la clave privada del fichero.
+     *
+     * @return La clave privada.
+     */
+    public void comprobarYborrarFicheros() {
+        File file = new File(CLAVE_PUBLICA_EMISOR);
+        if (file.exists()) {
+            file.delete();
+        }
+        file = new File(CLAVE_PRIVADA_EMISOR);
+        if (file.exists()) {
+            file.delete();
+        }
+        file = new File(CLAVE_PUBLICA_RECEPTOR);
+        if (file.exists()) {
+            file.delete();
+        }
+        file = new File(CLAVE_PRIVADA_RECEPTOR);
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    /**
+     * Guarda las claves en los ficheros.
+     *
+     * @param clavesEmisor   Claves del emisor.
+     * @param clavesReceptor Claves del receptor.
+     */
+    public void guardarClaves(KeyPair clavesEmisor, KeyPair clavesReceptor) {
+        FileOutputStream fileOutputStream;
+        try {
+            fileOutputStream = new FileOutputStream(CLAVE_PUBLICA_EMISOR);
+            fileOutputStream.write(clavesEmisor.getPublic().getEncoded());
+            fileOutputStream.close();
+            fileOutputStream = new FileOutputStream(CLAVE_PRIVADA_EMISOR);
+            fileOutputStream.write(clavesEmisor.getPrivate().getEncoded());
+            fileOutputStream.close();
+            fileOutputStream = new FileOutputStream(CLAVE_PUBLICA_RECEPTOR);
+            fileOutputStream.write(clavesReceptor.getPublic().getEncoded());
+            fileOutputStream.close();
+            fileOutputStream = new FileOutputStream(CLAVE_PRIVADA_RECEPTOR);
+            fileOutputStream.write(clavesReceptor.getPrivate().getEncoded());
+            fileOutputStream.close();
+        } catch (FileNotFoundException e) {
+            System.err.println("ERROR. No se ha encontrado el fichero. " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("ERROR. No se ha podido escribir en el fichero. " + e.getMessage());
+        }
     }
 
     /**
@@ -26,37 +85,16 @@ public class GestorLlaves {
      *
      * @return Clave pública
      */
-    public static KeyPair generarClaves() {
-        KeyPairGenerator generador;
-        KeyPair claves = null;
+    public KeyPair generadorClaves() {
         try {
-            generador = KeyPairGenerator.getInstance("RSA");
-            generador.initialize(2048);
-            claves = generador.generateKeyPair();
+            KeyPair claves;
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(2048);
+            claves = keyPairGenerator.generateKeyPair();
+            return claves;
         } catch (NoSuchAlgorithmException e) {
-            System.err.println("ERROR. No existe el algoritmo especificado. " + e.getMessage());
-        }
-        return claves;
-    }
-
-    /**
-     * Guarda las claves en los ficheros correspondientes.
-     *
-     * @param claves Claves a guardar.
-     */
-    public static void guardarClaves(KeyPair claves) {
-        FileOutputStream fileOutputStream;
-        try {
-            fileOutputStream = new FileOutputStream(CLAVE_PUBLICA);
-            fileOutputStream.write(claves.getPublic().getEncoded());
-            fileOutputStream.close();
-            fileOutputStream = new FileOutputStream(CLAVE_PRIVADA);
-            fileOutputStream.write(claves.getPrivate().getEncoded());
-            fileOutputStream.close();
-        } catch (FileNotFoundException e) {
-            System.err.println("ERROR. No se encuentra el fichero. " + e.getMessage());
-        } catch (IOException e) {
-            System.err.println("ERROR. Se ha producido un error durante la escritura en el fichero. " + e.getMessage());
+            System.out.println("No existe ese algoritmo");
+            throw new RuntimeException(e);
         }
     }
 
@@ -65,8 +103,8 @@ public class GestorLlaves {
      *
      * @return La clave pública.
      */
-    public static PublicKey obtenerClavePublica() {
-        File ficheroClavePublica = new File(CLAVE_PUBLICA);
+    public PublicKey obtenerClavePublica(String clave) {
+        File ficheroClavePublica = new File(clave);
         PublicKey clavePublica = null;
         try {
             byte[] bytesClavePublica = Files.readAllBytes(ficheroClavePublica.toPath());
@@ -88,8 +126,8 @@ public class GestorLlaves {
      *
      * @return La clave privada.
      */
-    public static PrivateKey obtenerClavePrivada() {
-        File ficheroClavePrivada = new File(CLAVE_PRIVADA);
+    public PrivateKey obtenerClavePrivada(String clave) {
+        File ficheroClavePrivada = new File(clave);
         PrivateKey clavePrivada = null;
         try {
             byte[] bytesClavePrivada = Files.readAllBytes(ficheroClavePrivada.toPath());
